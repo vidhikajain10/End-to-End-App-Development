@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI App Builder</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#0c0d10;--bg2:#13151a;--bg3:#1a1d24;--bg4:#21252f;
+    --border:#2a2f3d;--border2:#343b4f;
+    --text:#e8eaf2;--text2:#8b92a8;--text3:#555e73;
+    --accent:#7c6dfa;--accent2:#a594ff;--accentbg:#1e1b3a;
+    --green:#22c78a;--greenbg:#0d2219;
+    --amber:#f5a623;--amberbg:#231a07;
+    --red:#f05c5c;--redbg:#230f0f;
+    --blue:#4a9eff;--bluebg:#0d1a2e;
+    --cyan:#35d4c8;--cyanbg:#0a2120;
+    --radius:8px;--radius2:12px;
+  }
+  body{background:var(--bg);font-family:'Syne',sans-serif;color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+  .app{display:grid;grid-template-rows:48px 1fr;height:100vh;min-height:600px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg2);}
+  .topbar-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;letter-spacing:-.3px;}
+  .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+  .topbar-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+  .status-led{width:7px;height:7px;border-radius:50%;background:var(--green);}
+  .status-led.idle{background:var(--text3);}
+  .topbar-actions{display:flex;gap:8px;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+  .btn:hover{background:var(--bg4);border-color:var(--border2);}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  .main{display:grid;grid-template-columns:280px 1fr 300px;overflow:hidden;}
+
+  /* LEFT PANEL */
+  .left-panel{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--bg2);}
+  .panel-header{padding:14px 16px 10px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;}
+  .panel-body{padding:14px 16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+
+  .label{font-size:11px;color:var(--text2);margin-bottom:5px;font-weight:500;}
+  textarea.idea-input{width:100%;min-height:120px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;resize:vertical;outline:none;transition:border .15s;}
+  textarea.idea-input:focus{border-color:var(--accent);}
+  textarea.idea-input::placeholder{color:var(--text3);}
+  .model-select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:inherit;font-size:12px;padding:7px 10px;outline:none;cursor:pointer;}
+  .model-select:focus{border-color:var(--accent);}
+
+  .btn-block{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;border-radius:var(--radius);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+  .btn-generate{background:var(--accent);color:#fff;}
+  .btn-generate:hover{background:var(--accent2);transform:translateY(-1px);}
+  .btn-generate:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed;transform:none;}
+  .btn-download{background:var(--greenbg);color:var(--green);border:1px solid var(--green);}
+  .btn-download:hover{background:#14361f;}
+  .btn-download:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-clear{background:var(--redbg);color:var(--red);border:1px solid var(--red);}
+  .btn-clear:hover{background:#2e1212;}
+
+  .config-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg3);border-radius:var(--radius);border:1px solid var(--border);}
+  .config-label{font-size:12px;color:var(--text2);}
+  .toggle{width:34px;height:18px;background:var(--bg4);border-radius:9px;position:relative;cursor:pointer;border:1px solid var(--border2);transition:background .2s;}
+  .toggle.on{background:var(--accent);}
+  .toggle::after{content:'';position:absolute;width:12px;height:12px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s;}
+  .toggle.on::after{left:18px;}
+
+  /* API KEY input */
+  .api-key-row{display:flex;flex-direction:column;gap:5px;}
+  .api-key-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:7px 10px;outline:none;transition:border .15s;}
+  .api-key-input:focus{border-color:var(--accent);}
+  .api-key-input::placeholder{color:var(--text3);}
+  .api-key-hint{font-size:10px;color:var(--text3);}
+
+  /* CENTER PANEL */
+  .center-panel{display:flex;flex-direction:column;overflow:hidden;}
+  .pipeline{padding:16px 20px;background:var(--bg2);border-bottom:1px solid var(--border);}
+  .pipeline-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:12px;}
+  .pipeline-track{display:flex;align-items:center;gap:0;}
+  .agent-node{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;}
+  .agent-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1.5px solid var(--border2);background:var(--bg3);transition:all .3s;}
+  .agent-icon.active{border-color:var(--accent);background:var(--accentbg);box-shadow:0 0 12px rgba(124,109,250,.3);}
+  .agent-icon.done{border-color:var(--green);background:var(--greenbg);}
+  .agent-icon.error{border-color:var(--red);background:var(--redbg);}
+  .agent-name{font-size:10px;color:var(--text2);font-weight:500;text-align:center;}
+  .agent-name.active{color:var(--accent2);}
+  .agent-name.done{color:var(--green);}
+  .pipeline-arrow{width:24px;height:2px;background:var(--border2);flex-shrink:0;position:relative;top:-12px;}
+  .pipeline-arrow.done{background:var(--green);}
+
+  .logs-area{flex:1;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:14px 20px;background:var(--bg);display:flex;flex-direction:column;gap:2px;}
+  .log-line{display:flex;gap:10px;align-items:flex-start;padding:2px 0;animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  .log-time{color:var(--text3);flex-shrink:0;font-size:11px;padding-top:1px;}
+  .log-tag{font-size:10px;font-weight:600;padding:1px 7px;border-radius:4px;flex-shrink:0;min-width:72px;text-align:center;}
+  .tag-planner{background:rgba(124,109,250,.15);color:var(--accent2);}
+  .tag-developer{background:rgba(53,212,200,.15);color:var(--cyan);}
+  .tag-tester{background:rgba(74,158,255,.15);color:var(--blue);}
+  .tag-reviewer{background:rgba(245,166,35,.15);color:var(--amber);}
+  .tag-executor{background:rgba(34,199,138,.15);color:var(--green);}
+  .tag-system{background:rgba(139,146,168,.12);color:var(--text2);}
+  .tag-error{background:rgba(240,92,92,.15);color:var(--red);}
+  .log-msg{color:var(--text);flex:1;word-break:break-word;line-height:1.5;}
+  .log-msg .dim{color:var(--text3);}
+  .log-msg .hi{color:var(--green);}
+  .log-msg .warn{color:var(--amber);}
+  .log-msg .err{color:var(--red);}
+
+  .progress-bar-wrap{padding:10px 20px;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+  .progress-track{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .5s ease;width:0%;}
+  .progress-pct{font-size:12px;color:var(--text2);min-width:32px;}
+  .progress-label{font-size:11px;color:var(--text3);}
+
+  /* RIGHT PANEL */
+  .right-panel{border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--bg2);}
+  .right-tabs{display:flex;border-bottom:1px solid var(--border);}
+  .rtab{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+  .rtab.active{color:var(--accent2);border-bottom-color:var(--accent);}
+  .right-body{flex:1;overflow-y:auto;padding:12px;}
+  .file-tree{display:flex;flex-direction:column;gap:1px;}
+  .file-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:var(--radius);cursor:pointer;font-size:12px;font-family:'JetBrains Mono',monospace;transition:background .12s;}
+  .file-item:hover{background:var(--bg3);}
+  .file-item.folder{color:var(--amber);}
+  .file-item.file{color:var(--text2);padding-left:22px;}
+  .file-item.file.active{color:var(--accent2);background:var(--accentbg);}
+  .file-icon{font-size:13px;}
+  .code-preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);overflow:auto;max-height:380px;white-space:pre;line-height:1.6;}
+
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;}
+  .stat-val{font-size:22px;font-weight:700;color:var(--text);}
+  .stat-label{font-size:11px;color:var(--text3);margin-top:2px;}
+
+  .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--text3);font-size:12px;gap:8px;}
+  .empty-icon{font-size:28px;opacity:.4;}
+
+  /* Notification toast */
+  .toast{position:fixed;bottom:20px;right:20px;padding:12px 18px;border-radius:var(--radius2);background:var(--bg3);border:1px solid var(--border2);font-size:13px;z-index:9999;animation:fadeIn .3s;display:none;}
+  .toast.show{display:flex;align-items:center;gap:8px;}
+  .toast.success{border-color:var(--green);color:var(--green);}
+  .toast.error{border-color:var(--red);color:var(--red);}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-dot"></div>
+      AI App Builder
+      <span style="font-size:11px;color:var(--text3);font-weight:400;padding:2px 7px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;margin-left:4px;">v2.0 — Real Backend</span>
+    </div>
+    <div class="topbar-status" id="topbar-status">
+      <div class="status-led idle" id="status-led"></div>
+      <span id="status-text">Idle — ready to build</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn" onclick="fillExample('todo')">Example: Todo App ↗</button>
+      <button class="btn" onclick="fillExample('dashboard')">Example: Dashboard ↗</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+      <div class="panel-header">Project Input</div>
+      <div class="panel-body">
+        <div>
+          <div class="label">App Idea</div>
+          <textarea class="idea-input" id="idea-input" placeholder="Describe your app idea in detail...&#10;&#10;e.g. A task management app with real-time collaboration, user authentication, drag-and-drop boards, and a REST API."></textarea>
+        </div>
+
+        <div class="api-key-row">
+          <div class="label">Anthropic API Key <span style="color:var(--text3)">(optional — enables AI generation)</span></div>
+          <input type="password" class="api-key-input" id="api-key-input" placeholder="sk-ant-api03-...">
+          <div class="api-key-hint">Without key: smart template mode. With key: full AI generation.</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="label">Options</div>
+          <div class="config-row"><span class="config-label">Docker support</span><div class="toggle on" id="t-docker" onclick="this.classList.toggle('on')"></div></div>
+          <div class="config-row"><span class="config-label">Auth system</span><div class="toggle" id="t-auth" onclick="this.classList.toggle('on')"></div></div>
+          <div class="config-row"><span class="config-label">PostgreSQL</span><div class="toggle" id="t-postgres" onclick="this.classList.toggle('on')"></div></div>
+          <div class="config-row"><span class="config-label">Test suite</span><div class="toggle on" id="t-tests" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+
+        <button class="btn-block btn-generate" id="gen-btn" onclick="startGeneration()">
+          <i class="ti ti-player-play"></i> Generate App
+        </button>
+        <button class="btn-block btn-download" id="dl-btn" disabled onclick="downloadZip()">
+          <i class="ti ti-download"></i> Download ZIP
+        </button>
+        <button class="btn-block btn-clear" onclick="clearProject()">
+          <i class="ti ti-trash"></i> Clear Project
+        </button>
+      </div>
+    </div>
+
+    <!-- CENTER PANEL -->
+    <div class="center-panel">
+      <div class="pipeline">
+        <div class="pipeline-title">Agent Pipeline — Real Execution</div>
+        <div class="pipeline-track" id="pipeline-track">
+          <div class="agent-node" id="node-planner">
+            <div class="agent-icon" id="icon-planner"><i class="ti ti-map-2"></i></div>
+            <div class="agent-name" id="name-planner">Planner</div>
+          </div>
+          <div class="pipeline-arrow" id="arrow-1"></div>
+          <div class="agent-node" id="node-developer">
+            <div class="agent-icon" id="icon-developer"><i class="ti ti-code"></i></div>
+            <div class="agent-name" id="name-developer">Developer</div>
+          </div>
+          <div class="pipeline-arrow" id="arrow-2"></div>
+          <div class="agent-node" id="node-tester">
+            <div class="agent-icon" id="icon-tester"><i class="ti ti-test-pipe"></i></div>
+            <div class="agent-name" id="name-tester">Tester</div>
+          </div>
+          <div class="pipeline-arrow" id="arrow-3"></div>
+          <div class="agent-node" id="node-reviewer">
+            <div class="agent-icon" id="icon-reviewer"><i class="ti ti-eye"></i></div>
+            <div class="agent-name" id="name-reviewer">Reviewer</div>
+          </div>
+          <div class="pipeline-arrow" id="arrow-4"></div>
+          <div class="agent-node" id="node-executor">
+            <div class="agent-icon" id="icon-executor"><i class="ti ti-terminal-2"></i></div>
+            <div class="agent-name" id="name-executor">Executor</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="logs-area" id="logs-area">
+        <div class="log-line">
+          <span class="log-time">00:00</span>
+          <span class="log-tag tag-system">SYSTEM</span>
+          <span class="log-msg">AI App Builder v2 ready. Real backend connected at <span class="hi">http://localhost:3000</span>. Enter your idea and click Generate.</span>
+        </div>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-pct" id="progress-pct">0%</div>
+        <div class="progress-label" id="progress-label">Waiting...</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <div class="right-tabs">
+        <div class="rtab active" id="tab-files" onclick="switchTab('files')">Files</div>
+        <div class="rtab" id="tab-code" onclick="switchTab('code')">Code</div>
+        <div class="rtab" id="tab-stats" onclick="switchTab('stats')">Stats</div>
+      </div>
+      <div class="right-body" id="right-body">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="ti ti-folder-off"></i></div>
+          <span>No project generated yet</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const BACKEND = 'http://localhost:3000';
+const state = {
+  running: false,
+  projectId: null,
+  files: [],        // [{path, content}]
+  stats: {},
+  selectedFile: null,
+  activeTab: 'files',
+  logStart: null
+};
+
+// ── UI helpers ──────────────────────────────────────────────────────────────
+function pad(n){return String(n).padStart(2,'0');}
+function getTime(){
+  if(!state.logStart) return '00:00';
+  const d = Math.floor((Date.now()-state.logStart)/1000);
+  return pad(Math.floor(d/60))+':'+pad(d%60);
+}
+function addLog(agent, msg){
+  const area = document.getElementById('logs-area');
+  const div = document.createElement('div');
+  div.className = 'log-line';
+  const tagClass = 'tag-' + agent;
+  div.innerHTML = `<span class="log-time">${getTime()}</span><span class="log-tag ${tagClass}">${agent.toUpperCase()}</span><span class="log-msg">${msg}</span>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+function setProgress(pct, label){
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-label').textContent = label;
+}
+function setAgent(agent, status){
+  document.getElementById('icon-' + agent).className = 'agent-icon ' + (status||'');
+  document.getElementById('name-' + agent).className = 'agent-name ' + (status||'');
+}
+function setArrow(i, done){
+  const el = document.getElementById('arrow-' + i);
+  if(el) el.className = 'pipeline-arrow ' + (done ? 'done' : '');
+}
+function setStatus(text, active){
+  document.getElementById('status-text').textContent = text;
+  document.getElementById('status-led').className = 'status-led ' + (active ? '' : 'idle');
+}
+function showToast(msg, type='success'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+function fillExample(type){
+  const examples = {
+    todo: 'A todo list app with task categories, due dates, priority levels, drag-and-drop reordering, local storage persistence, and a clean dashboard UI.',
+    dashboard: 'An analytics dashboard with interactive charts showing user growth, revenue trends, and activity heatmaps. Include a sidebar nav, dark mode toggle, and export to CSV.'
+  };
+  document.getElementById('idea-input').value = examples[type] || '';
+}
+
+// ── Main generation ─────────────────────────────────────────────────────────
+async function startGeneration(){
+  const idea = document.getElementById('idea-input').value.trim();
+  if(!idea){ document.getElementById('idea-input').focus(); return; }
+  if(state.running) return;
+
+  const apiKey = document.getElementById('api-key-input').value.trim();
+  const options = {
+    docker:   document.getElementById('t-docker').classList.contains('on'),
+    auth:     document.getElementById('t-auth').classList.contains('on'),
+    postgres: document.getElementById('t-postgres').classList.contains('on'),
+    tests:    document.getElementById('t-tests').classList.contains('on'),
+    apiKey
+  };
+
+  state.running = true;
+  state.logStart = Date.now();
+  state.files = [];
+  state.projectId = null;
+
+  document.getElementById('gen-btn').disabled = true;
+  document.getElementById('dl-btn').disabled = true;
+  document.getElementById('logs-area').innerHTML = '';
+
+  ['planner','developer','tester','reviewer','executor'].forEach(a => setAgent(a,''));
+  for(let i=1;i<=4;i++) setArrow(i, false);
+  setProgress(0, 'Connecting to backend...');
+  setStatus('Running — real generation active', true);
+
+  try {
+    // If API key provided, send it to backend as a header via body
+    const response = await fetch(BACKEND + '/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idea, options })
+    });
+
+    if(!response.ok) throw new Error('Backend not running. Start it with: node server.js');
+
+    // Read SSE stream
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+
+    while(true){
+      const { done, value } = await reader.read();
+      if(done) break;
+
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+
+      for(const line of lines){
+        if(!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if(!raw) continue;
+        try {
+          const evt = JSON.parse(raw);
+          handleEvent(evt);
+        } catch(e) { /* skip malformed */ }
+      }
+    }
+  } catch(err){
+    addLog('system', `<span class="err">ERROR: ${err.message}</span>`);
+    addLog('system', '<span class="warn">Make sure the backend is running: node server.js</span>');
+    setStatus('Error — backend not reachable', false);
+    setProgress(0, 'Failed');
+    document.getElementById('gen-btn').disabled = false;
+    state.running = false;
+  }
+}
+
+function handleEvent(evt){
+  switch(evt.type){
+    case 'log':
+      addLog(evt.agent, evt.msg);
+      break;
+
+    case 'agent':
+      setAgent(evt.agent, evt.status);
+      break;
+
+    case 'arrow':
+      setArrow(evt.index, evt.done);
+      break;
+
+    case 'progress':
+      setProgress(evt.pct, evt.label);
+      break;
+
+    case 'done':
+      state.projectId = evt.projectId;
+      state.stats = evt.stats;
+      // Build file list with content
+      state.files = evt.files.map(path => ({
+        path,
+        content: evt.fileContents[path] || ''
+      }));
+      
+      setStatus('Done — project saved to disk', false);
+      document.getElementById('gen-btn').disabled = false;
+      document.getElementById('dl-btn').disabled = false;
+      state.running = false;
+      
+      addLog('system', `<span class="hi">✓ ${evt.files.length} files written to generated_apps/${evt.projectId}/</span>`);
+      addLog('system', `<span class="hi">✓ ZIP ready — click Download ZIP to save to your computer</span>`);
+      
+      renderTab('files');
+      showToast(`✓ Project generated! ${evt.files.length} files ready.`);
+      break;
+
+    case 'error':
+      addLog('error', `<span class="err">${evt.message}</span>`);
+      setStatus('Error during generation', false);
+      document.getElementById('gen-btn').disabled = false;
+      state.running = false;
+      showToast('Generation error: ' + evt.message, 'error');
+      break;
+  }
+}
+
+// ── Download ZIP ────────────────────────────────────────────────────────────
+function downloadZip(){
+  if(!state.projectId){
+    showToast('No project generated yet', 'error');
+    return;
+  }
+  addLog('executor', 'Requesting ZIP download...');
+  const url = `${BACKEND}/download/${state.projectId}`;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${state.projectId}.zip`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  addLog('executor', `<span class="hi">✓ ZIP download started — ${state.projectId}.zip</span>`);
+  showToast('ZIP download started!');
+}
+
+// ── Clear ────────────────────────────────────────────────────────────────────
+function clearProject(){
+  state.running = false;
+  state.projectId = null;
+  state.files = [];
+  state.stats = {};
+  state.selectedFile = null;
+
+  ['planner','developer','tester','reviewer','executor'].forEach(a => setAgent(a,''));
+  for(let i=1;i<=4;i++) setArrow(i, false);
+  setProgress(0, 'Waiting...');
+  setStatus('Idle — ready to build', false);
+  document.getElementById('gen-btn').disabled = false;
+  document.getElementById('dl-btn').disabled = true;
+  document.getElementById('logs-area').innerHTML = `<div class="log-line">
+    <span class="log-time">00:00</span>
+    <span class="log-tag tag-system">SYSTEM</span>
+    <span class="log-msg">Project cleared. Enter a new idea to generate.</span>
+  </div>`;
+  renderTab(state.activeTab);
+}
+
+// ── Tabs ────────────────────────────────────────────────────────────────────
+function switchTab(tab){
+  state.activeTab = tab;
+  ['files','code','stats'].forEach(t => {
+    document.getElementById('tab-'+t).className = 'rtab' + (t===tab ? ' active' : '');
+  });
+  renderTab(tab);
+}
+
+function renderTab(tab){
+  const body = document.getElementById('right-body');
+
+  if(tab === 'files'){
+    if(!state.files.length){
+      body.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-folder-off"></i></div><span>No project generated yet</span></div>`;
+      return;
+    }
+    // Group into folders
+    const folders = {};
+    const rootFiles = [];
+    for(const f of state.files){
+      const parts = f.path.split('/');
+      if(parts.length > 1){
+        const folder = parts[0];
+        if(!folders[folder]) folders[folder] = [];
+        folders[folder].push(f);
+      } else {
+        rootFiles.push(f);
+      }
+    }
+    let html = '<div class="file-tree">';
+    // Root files first
+    for(const f of rootFiles){
+      const idx = state.files.indexOf(f);
+      const active = state.selectedFile === idx ? ' active' : '';
+      html += `<div class="file-item file${active}" onclick="selectFile(${idx})"><i class="ti ti-file-code"></i><span>${f.path}</span></div>`;
+    }
+    // Then folders
+    for(const [folder, files] of Object.entries(folders)){
+      html += `<div class="file-item folder"><i class="ti ti-folder" style="color:#f5a623;font-size:14px;"></i><span>${folder}/</span></div>`;
+      for(const f of files){
+        const idx = state.files.indexOf(f);
+        const active = state.selectedFile === idx ? ' active' : '';
+        const fname = f.path.split('/').slice(1).join('/');
+        html += `<div class="file-item file${active}" onclick="selectFile(${idx})"><i class="ti ti-file-code"></i><span>${fname}</span></div>`;
+      }
+    }
+    html += '</div>';
+    body.innerHTML = html;
+
+  } else if(tab === 'code'){
+    if(state.selectedFile === null || !state.files[state.selectedFile]){
+      body.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:8px;">Select a file from the Files tab to preview code.</div>`;
+      return;
+    }
+    const f = state.files[state.selectedFile];
+    const escaped = escapeHtml(f.content || '');
+    body.innerHTML = `
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-family:'JetBrains Mono',monospace;display:flex;justify-content:space-between;align-items:center;">
+        <span>${f.path}</span>
+        <span style="color:var(--text3)">${(f.content||'').split('\n').length} lines</span>
+      </div>
+      <div class="code-preview">${escaped}</div>`;
+
+  } else if(tab === 'stats'){
+    const s = state.stats;
+    body.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val">${s.files||0}</div><div class="stat-label">Files generated</div></div>
+        <div class="stat-card"><div class="stat-val">${s.lines ? s.lines.toLocaleString() : '0'}</div><div class="stat-label">Lines of code</div></div>
+        <div class="stat-card"><div class="stat-val">${s.agents||0}</div><div class="stat-label">Agents used</div></div>
+        <div class="stat-card"><div class="stat-val">${state.projectId ? '1' : '0'}</div><div class="stat-label">Projects saved</div></div>
+      </div>
+      ${state.projectId ? `
+      <div style="font-size:11px;color:var(--text3);padding:8px 0;border-top:1px solid var(--border);line-height:1.8;">
+        Stack: ${s.stack || '—'}<br>
+        Project ID: ${state.projectId}<br>
+        Folder: generated_apps/${state.projectId}/<br>
+        ZIP: <span style="color:var(--green)">Ready to download</span>
+      </div>
+      <div style="margin-top:10px;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);">
+        <div style="color:var(--green);margin-bottom:6px;"># After downloading ZIP:</div>
+        <div>unzip ${state.projectId}.zip</div>
+        <div>cd ${state.projectId}/</div>
+        <div>npm install</div>
+        <div>npm start</div>
+      </div>` : '<div style="color:var(--text3);font-size:12px;padding:8px;">Generate a project to see stats.</div>'}`;
+  }
+}
+
+function selectFile(i){
+  state.selectedFile = i;
+  renderTab('files');
+  switchTab('code');
+}
+
+function escapeHtml(str){
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Ctrl+Enter to generate
+document.getElementById('idea-input').addEventListener('keydown', function(e){
+  if(e.ctrlKey && e.key === 'Enter') startGeneration();
+});
+</script>
+</body>
+</html>
