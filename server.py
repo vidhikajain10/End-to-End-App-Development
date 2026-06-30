@@ -19,7 +19,10 @@ from fastapi.responses import StreamingResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import psycopg2
+try:
+    import psycopg2
+except Exception:
+    psycopg2 = None
 
 # ─── App Setup ───────────────────────────────────────────────────────────────
 app = FastAPI(title="AI App Builder", version="2.0")
@@ -41,6 +44,9 @@ def save_project(app_name, prompt):
         return
 
     try:
+       if psycopg2 is None:
+    return
+
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
 
