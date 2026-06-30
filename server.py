@@ -29,9 +29,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-PROJECTS_DIR = Path("generated_apps")
-PROJECTS_DIR.mkdir(exist_ok=True)
+PROJECTS_DIR = Path("/tmp/generated_apps")
+PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ─── Request Models ───────────────────────────────────────────────────────────
