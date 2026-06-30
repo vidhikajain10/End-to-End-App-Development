@@ -1,37 +1,90 @@
-<!-- register.html -->
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>Register</title>
+
+<style>
+body{
+background:#0c0d10;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-family:'Syne',sans-serif;
+color:white;
+}
+
+.card{
+width:420px;
+background:#13151a;
+padding:40px;
+border-radius:12px;
+border:1px solid #2a2f3d;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:15px;
+background:#1a1d24;
+border:1px solid #343b4f;
+color:white;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#7c6dfa;
+border:none;
+color:white;
+border-radius:8px;
+}
+</style>
 </head>
+
 <body>
+
+<div class="card">
 
 <h1>Create Account</h1>
 
 <input id="username" placeholder="Username">
+
 <input id="email" placeholder="Email">
+
 <input id="password" type="password" placeholder="Password">
 
-<button onclick="register()">Register</button>
+<button onclick="register()">
+Create Account
+</button>
+
+</div>
 
 <script>
 async function register(){
 
-    const res = await fetch('/register',{
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify({
-            username:document.getElementById('username').value,
-            email:document.getElementById('email').value,
-            password:document.getElementById('password').value
-        })
-    });
+const res=await fetch("/register",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+username:document.getElementById("username").value,
+email:document.getElementById("email").value,
+password:document.getElementById("password").value
+})
+});
 
-    if(res.ok){
-        window.location='/';
-    }
+const data=await res.json();
+
+if(data.success){
+window.location="/";
+}
+else{
+alert(data.message);
+}
 }
 </script>
 
