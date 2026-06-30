@@ -82,11 +82,11 @@ const data = await res.json();
 
 console.log(data);
 
+alert(JSON.stringify(data));
+
 if(data.success){
-    alert("Registration successful");
-    window.location="/";
-}
-else{
+    window.location="/dashboard";
+}else{
     alert(data.message || "Registration failed");
 }
 }
