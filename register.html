@@ -66,6 +66,7 @@ Create Account
 async function register(){
 
 const res=await fetch("/register",{
+console.log("Response Status:", res.status);
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -77,13 +78,16 @@ password:document.getElementById("password").value
 })
 });
 
-const data=await res.json();
+const data = await res.json();
+
+console.log(data);
 
 if(data.success){
-window.location="/";
+    alert("Registration successful");
+    window.location="/";
 }
 else{
-alert(data.message);
+    alert(data.message || "Registration failed");
 }
 }
 </script>
