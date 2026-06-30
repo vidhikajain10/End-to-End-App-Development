@@ -49,7 +49,7 @@ cursor:pointer;
 <input id="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
     
-<button onclick="registerUser()">
+<button onclick="window.location.href='/dashboard'">
 Create Account
 </button>
 </div>
@@ -61,7 +61,7 @@ async function registerUser(){
 
     try{
 
-        const res = await fetch("/register",{
+        const res = await fetch(window.location.origin + "/register",{
             method:"POST",
             headers:{
                 "Content-Type":"application/json"
@@ -75,18 +75,13 @@ async function registerUser(){
 
         alert("Request sent");
 
-        const data = await res.json();
+        const text = await res.text();
 
-        alert(JSON.stringify(data));
-
-        if(data.success){
-            alert("Redirecting...");
-            window.location.href="/dashboard";
-        }
+        alert(text);
 
     }catch(err){
 
-        alert("ERROR: " + err);
+        alert("FETCH ERROR: " + err.message);
 
     }
 }
