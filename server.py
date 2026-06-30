@@ -19,10 +19,8 @@ from fastapi.responses import StreamingResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-try:
-    import psycopg2
-except Exception:
-    psycopg2 = None
+import psycopg2
+
 
 # ─── App Setup ───────────────────────────────────────────────────────────────
 app = FastAPI(title="AI App Builder", version="2.0")
