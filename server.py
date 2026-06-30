@@ -20,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from fastapi import HTTPException
+from fastapi.responses import StreamingResponse, FileResponse
 try:
     import psycopg2
 except Exception:
@@ -568,6 +569,31 @@ async def login(req: LoginRequest):
 
 
 # ─── Routes ──────────────────────────────────────────────────────────────────
+
+# --- Routes --------------------------------------------------
+
+@app.get("/")
+async def home():
+    return FileResponse("login.html")
+
+
+@app.get("/register-page")
+async def register_page():
+    return FileResponse("register.html")
+
+
+@app.get("/dashboard")
+async def dashboard():
+    return FileResponse("dashboard.html")
+
+
+@app.get("/builder")
+async def builder():
+    return FileResponse("index.html")
+
+
+@app.post("/generate")
+async def generate(req: GenerateRequest):
 
 @app.post("/generate")
 async def generate(req: GenerateRequest):
