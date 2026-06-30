@@ -19,7 +19,11 @@ from fastapi.responses import StreamingResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import psycopg2
+try:
+    import psycopg2
+except Exception:
+    psycopg2 = None
+
 
 
 # ─── App Setup ───────────────────────────────────────────────────────────────
@@ -42,16 +46,13 @@ def save_project(app_name, prompt):
         return
 
     try:
-      if psycopg2 is None:
-         return
-
-         conn = psycopg2.connect(DATABASE_URL)
-         cur = conn.cursor()
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
 
         cur.execute(
             """
-            INSERT INTO projects(app_name, prompt)
-            VALUES (%s,%s)
+            INSERT INTO projects (app_name, prompt)
+            VALUES (%s, %s)
             """,
             (app_name, prompt),
         )
