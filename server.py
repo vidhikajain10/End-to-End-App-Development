@@ -425,30 +425,38 @@ class LoginRequest(BaseModel):
     email: str
     password: str
 
-
 @app.post("/register")
 async def register(req: RegisterRequest):
 
-    if psycopg2 is None:
-        raise HTTPException(500, "Database unavailable")
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
 
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO users (username, email, password_hash)
+            VALUES (%s, %s, %s)
+            """,
+            (req.username, req.email, req.password)
+        )
 
-    cur.execute(
-        """
-        INSERT INTO users (username, email, password_hash)
-        VALUES (%s, %s, %s)
-        """,
-        (req.username, req.email, req.password)
-    )
+        conn.commit()
 
-    conn.commit()
-    cur.close()
-    conn.close()
+        cur.close()
+        conn.close()
 
-    return {"success": True,
-            "message": "User created successfully"}
+        return {
+            "success": True,
+            "message": "User created successfully"
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
+
+
 
 
 @app.post("/login")
