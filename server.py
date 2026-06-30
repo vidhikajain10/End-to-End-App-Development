@@ -569,9 +569,6 @@ async def login(req: LoginRequest):
 
 
 # ─── Routes ──────────────────────────────────────────────────────────────────
-
-# --- Routes --------------------------------------------------
-
 @app.get("/")
 async def home():
     return FileResponse("login.html")
@@ -592,8 +589,6 @@ async def builder():
     return FileResponse("index.html")
 
 
-@app.post("/generate")
-async def generate(req: GenerateRequest):
 
 @app.post("/generate")
 async def generate(req: GenerateRequest):
