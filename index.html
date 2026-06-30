@@ -235,7 +235,7 @@
         <div class="log-line">
           <span class="log-time">00:00</span>
           <span class="log-tag tag-system">SYSTEM</span>
-          <span class="log-msg">AI App Builder v2 ready. Real backend connected at <span class="hi">http://localhost:3000</span>. Enter your idea and click Generate.</span>
+          <span class="log-msg">AI App Builder v2 ready. Real backend connected.Enter your idea and click Generate.</span>
         </div>
       </div>
 
@@ -362,7 +362,8 @@ async function startGeneration(){
       body: JSON.stringify({ idea, options })
     });
 
-    if(!response.ok) throw new Error('Backend not running. Start it with: node server.js');
+   if(!response.ok)
+    throw new Error(`Backend returned ${response.status}`);
 
     // Read SSE stream
     const reader = response.body.getReader();
@@ -389,7 +390,7 @@ async function startGeneration(){
     }
   } catch(err){
     addLog('system', `<span class="err">ERROR: ${err.message}</span>`);
-    addLog('system', '<span class="warn">Make sure the backend is running: node server.js</span>');
+    addLog('system', '<span class="warn">Check Render logs for backend errors.</span>');
     setStatus('Error — backend not reachable', false);
     setProgress(0, 'Failed');
     document.getElementById('gen-btn').disabled = false;
