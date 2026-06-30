@@ -1,41 +1,110 @@
-<!-- login.html -->
 <!DOCTYPE html>
 <html>
 <head>
-<title>Login</title>
+<meta charset="UTF-8">
+<title>Login - AI App Builder</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+
+<style>
+body{
+background:#0c0d10;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-family:'Syne',sans-serif;
+color:white;
+}
+
+.card{
+width:420px;
+background:#13151a;
+border:1px solid #2a2f3d;
+padding:40px;
+border-radius:12px;
+}
+
+h1{
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:15px;
+background:#1a1d24;
+border:1px solid #343b4f;
+border-radius:8px;
+color:white;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#7c6dfa;
+border:none;
+color:white;
+border-radius:8px;
+cursor:pointer;
+}
+
+a{
+color:#a594ff;
+}
+</style>
 </head>
+
 <body>
 
-<h1>AI App Builder Login</h1>
+<div class="card">
+
+<h1>AI App Builder</h1>
 
 <input id="email" placeholder="Email">
+
 <input id="password" type="password" placeholder="Password">
 
-<button onclick="login()">Login</button>
+<button onclick="login()">
+Login
+</button>
+
+<br><br>
 
 <p>
-<a href="/register-page">Register</a>
+Don't have an account?
+<a href="/register-page">
+Register
+</a>
 </p>
 
+</div>
+
 <script>
-async function login() {
+async function login(){
 
-    const res = await fetch('/login', {
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify({
-            email:document.getElementById('email').value,
-            password:document.getElementById('password').value
-        })
-    });
+const email=document.getElementById("email").value;
+const password=document.getElementById("password").value;
 
-    if(res.ok){
-        window.location='/builder';
-    }else{
-        alert('Invalid Login');
-    }
+const res=await fetch("/login",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+email,
+password
+})
+});
+
+const data=await res.json();
+
+if(data.success){
+window.location="/dashboard";
+}
+else{
+alert(data.message);
+}
 }
 </script>
 
