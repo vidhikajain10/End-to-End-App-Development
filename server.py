@@ -19,6 +19,7 @@ from fastapi.responses import StreamingResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi import HTTPException
 try:
     import psycopg2
 except Exception:
@@ -421,6 +422,149 @@ async def test_data_endpoint():
         "stack": "FastAPI + Jinja2 + HTML/CSS/JS" + (" + Docker" if options.docker else "") + (" + pytest" if options.tests else ""),
         "files": files,
     }
+
+# --- Routes ---
+
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+@app.post("/register")
+async def register(req: RegisterRequest):
+
+    if psycopg2 is None:
+        raise HTTPException(500, "Database unavailable")
+
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        INSERT INTO users (username, email, password_hash)
+        VALUES (%s, %s, %s)
+        """,
+        (req.username, req.email, req.password)
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"success": True}
+
+
+@app.post("/login")
+async def login(req: LoginRequest):
+
+    if psycopg2 is None:
+        raise HTTPException(500, "Database unavailable")
+
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT id, username
+        FROM users
+        WHERE email=%s AND password_hash=%s
+        """,
+        (req.email, req.password)
+    )
+
+    user = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if not user:
+        raise HTTPException(401, "Invalid credentials")
+
+    return {
+        "success": True,
+        "user_id": user[0],
+        "username": user[1]
+    }
+
+# --- Routes ---
+
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+@app.post("/register")
+async def register(req: RegisterRequest):
+
+    if psycopg2 is None:
+        raise HTTPException(500, "Database unavailable")
+
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        INSERT INTO users (username, email, password_hash)
+        VALUES (%s, %s, %s)
+        """,
+        (req.username, req.email, req.password)
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"success": True}
+
+
+@app.post("/login")
+async def login(req: LoginRequest):
+
+    if psycopg2 is None:
+        raise HTTPException(500, "Database unavailable")
+
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT id, username
+        FROM users
+        WHERE email=%s AND password_hash=%s
+        """,
+        (req.email, req.password)
+    )
+
+    user = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if not user:
+        raise HTTPException(401, "Invalid credentials")
+
+    return {
+        "success": True,
+        "user_id": user[0],
+        "username": user[1]
+    }
+
+
+
+
+
 
 
 # ─── Routes ──────────────────────────────────────────────────────────────────
