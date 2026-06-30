@@ -45,6 +45,10 @@ def save_project(app_name, prompt):
         print("DATABASE_URL not configured")
         return
 
+    if psycopg2 is None:
+        print("psycopg2 not available")
+        return
+
     try:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
@@ -54,7 +58,7 @@ def save_project(app_name, prompt):
             INSERT INTO projects (app_name, prompt)
             VALUES (%s, %s)
             """,
-            (app_name, prompt),
+            (app_name, prompt)
         )
 
         conn.commit()
