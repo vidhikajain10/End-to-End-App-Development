@@ -1,0 +1,43 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login</title>
+</head>
+<body>
+
+<h1>AI App Builder Login</h1>
+
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p>
+<a href="/register-page">Register</a>
+</p>
+
+<script>
+async function login() {
+
+    const res = await fetch('/login', {
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+            email:document.getElementById('email').value,
+            password:document.getElementById('password').value
+        })
+    });
+
+    if(res.ok){
+        window.location='/builder';
+    }else{
+        alert('Invalid Login');
+    }
+}
+</script>
+
+</body>
+</html>
