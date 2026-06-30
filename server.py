@@ -500,24 +500,19 @@ async def login(req: LoginRequest):
 # ─── Routes ──────────────────────────────────────────────────────────────────
 @app.get("/")
 async def home():
-    return FileResponse("login.html")
-
+    return FileResponse("templates/login.html")
 
 @app.get("/register-page")
 async def register_page():
-    return FileResponse("register.html")
-
+    return FileResponse("templates/register.html")
 
 @app.get("/dashboard")
 async def dashboard():
-    return FileResponse("dashboard.html")
-
+    return FileResponse("templates/dashboard.html")
 
 @app.get("/builder")
 async def builder():
     return FileResponse("index.html")
-
-
 
 @app.post("/generate")
 async def generate(req: GenerateRequest):
