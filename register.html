@@ -48,21 +48,46 @@ cursor:pointer;
 <input id="username" placeholder="Username">
 <input id="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
-
-<button onclick="alert('Button clicked')">
+    
+<button onclick="registerUser()">
 Create Account
 </button>
 </div>
 
 <script>
-async function registerUser() {
-    try {
-        const res = await fetch("/register", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
+async function registerUser(){
+
+    alert("Register function started");
+
+    try{
+
+        const res = await fetch("/register",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
             },
-            body: JSON.stringify({
-                username: document.getElementById("username").value,
-                email: document.getElementById("email").value,
-                password: document.getElementById("
+            body:JSON.stringify({
+                username:document.getElementById("username").value,
+                email:document.getElementById("email").value,
+                password:document.getElementById("password").value
+            })
+        });
+
+        alert("Request sent");
+
+        const data = await res.json();
+
+        alert(JSON.stringify(data));
+
+        if(data.success){
+            alert("Redirecting...");
+            window.location.href="/dashboard";
+        }
+
+    }catch(err){
+
+        alert("ERROR: " + err);
+
+    }
+}
+</script>
