@@ -1,95 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Register</title>
-
-<style>
-body{
-background:#0c0d10;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-font-family:'Syne',sans-serif;
-color:white;
-}
-
-.card{
-width:420px;
-background:#13151a;
-padding:40px;
-border-radius:12px;
-border:1px solid #2a2f3d;
-}
-
-input{
-width:100%;
-padding:12px;
-margin-bottom:15px;
-background:#1a1d24;
-border:1px solid #343b4f;
-color:white;
-border-radius:8px;
-}
-
-button{
-width:100%;
-padding:12px;
-background:#7c6dfa;
-border:none;
-color:white;
-border-radius:8px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="card">
-
-<h1>Create Account</h1>
-
-<input id="username" placeholder="Username">
-
-<input id="email" placeholder="Email">
-
-<input id="password" type="password" placeholder="Password">
-
-<button onclick="register()">
-Create Account
-</button>
-
-</div>
-
 <script>
 async function register(){
 
-const res=await fetch("/register",{
-console.log("Response Status:", res.status);
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-username:document.getElementById("username").value,
-email:document.getElementById("email").value,
-password:document.getElementById("password").value
-})
-});
+    try{
 
-const data = await res.json();
+        const res = await fetch("/register",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                username:document.getElementById("username").value,
+                email:document.getElementById("email").value,
+                password:document.getElementById("password").value
+            })
+        });
 
-console.log(data);
-alert(JSON.stringify(data));
+        console.log("Response Status:", res.status);
 
-if(data.success){
-    window.location="/dashboard";
-}else{
-    alert(data.message || "Registration failed");
-}
+        const data = await res.json();
+
+        console.log(data);
+
+        if(data.success){
+            alert("Registration successful!");
+            window.location.href = "/dashboard";
+            return;
+        }
+
+        alert(data.message || "Registration failed");
+
+    }
+    catch(err){
+        console.error(err);
+        alert("Error: " + err.message);
+    }
 }
 </script>
-
-</body>
-</html>
