@@ -527,7 +527,8 @@ async def register(req: RegisterRequest):
     cur.close()
     conn.close()
 
-    return {"success": True}
+    return {"success": True,
+            "message": "User created successfully"}
 
 
 @app.post("/login")
