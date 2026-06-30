@@ -44,11 +44,11 @@ def save_project(app_name, prompt):
         return
 
     try:
-       if psycopg2 is None:
-    return
+      if psycopg2 is None:
+         return
 
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
+         conn = psycopg2.connect(DATABASE_URL)
+         cur = conn.cursor()
 
         cur.execute(
             """
