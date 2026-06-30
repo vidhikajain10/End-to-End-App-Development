@@ -36,7 +36,28 @@ PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 def save_project(app_name, prompt):
-    conn = psycopg2.connect(DATABASE_URL)
+    if not DATABASE_URL:
+        print("DATABASE_URL not configured")
+        return
+
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+
+        cur.execute(
+            """
+            INSERT INTO projects(app_name, prompt)
+            VALUES (%s,%s)
+            """,
+            (app_name, prompt),
+        )
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        print("Database Error:", e)
     cur = conn.cursor()
 
     cur.execute("""
