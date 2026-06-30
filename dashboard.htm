@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - AI App Builder</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#0b1020;
+    color:white;
+    min-height:100vh;
+}
+
+.navbar{
+    background:#121933;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.logout-btn{
+    background:#ff4d4d;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.container{
+    padding:40px;
+}
+
+.card{
+    background:#151d3d;
+    padding:25px;
+    border-radius:15px;
+    margin-bottom:20px;
+}
+
+.card h2{
+    margin-bottom:15px;
+}
+
+.builder-btn{
+    display:inline-block;
+    background:#7c5cff;
+    color:white;
+    text-decoration:none;
+    padding:15px 25px;
+    border-radius:10px;
+    margin-top:15px;
+}
+
+.project{
+    background:#1a2348;
+    padding:15px;
+    margin-top:10px;
+    border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="logo">🤖 AI App Builder</div>
+
+    <button class="logout-btn" onclick="logout()">
+        Logout
+    </button>
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Welcome User 👋</h2>
+
+        <p>
+            Create AI-powered applications and manage your generated projects.
+        </p>
+
+        <a href="/builder" class="builder-btn">
+            🚀 Create New App
+        </a>
+    </div>
+
+    <div class="card">
+
+        <h2>Your Projects</h2>
+
+        <div id="projects">
+
+            <div class="project">
+                AI Resume Analyzer
+            </div>
+
+            <div class="project">
+                Inventory Forecasting App
+            </div>
+
+            <div class="project">
+                Plant Disease Detection
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function logout(){
+    window.location = "/";
+}
+
+</script>
+
+</body>
+</html>
