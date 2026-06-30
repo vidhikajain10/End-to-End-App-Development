@@ -32,6 +32,21 @@ app.add_middleware(
 PROJECTS_DIR = Path("/tmp/generated_apps")
 PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+def save_project(app_name, prompt):
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO projects (app_name, prompt)
+        VALUES (%s, %s)
+    """, (app_name, prompt))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
 
 # ─── Request Models ───────────────────────────────────────────────────────────
 class Options(BaseModel):
@@ -383,6 +398,10 @@ async def test_data_endpoint():
 async def generate(req: GenerateRequest):
     """Main generation endpoint — streams SSE progress events."""
     idea = req.idea.strip()
+    save_project(
+    app_name=slugify(idea),
+    prompt=idea
+)
     if not idea:
         raise HTTPException(400, "No idea provided")
 
