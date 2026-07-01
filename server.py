@@ -42,24 +42,11 @@ PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 def save_project(app_name, prompt):
-    if not DATABASE_URL or psycopg2 is None:
+    if psycopg2 is None or not DATABASE_URL:
         return
 
     try:
-        if psycopg2 is None:
-           return {
-        "success": False,
-        "message": "psycopg2 not installed"
-           }
-
-        if not DATABASE_URL:
-            return {
-        "success": False,
-        "message": "DATABASE_URL missing"
-           }
-
-    conn = psycopg2.connect(DATABASE_URL)
-
+        conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
 
         cur.execute(
@@ -74,7 +61,8 @@ def save_project(app_name, prompt):
         cur.close()
         conn.close()
 
-
+    except Exception as e:
+        print("Database Error:", e)
 
 # ─── Request Models ───────────────────────────────────────────────────────────
 class Options(BaseModel):
@@ -449,8 +437,31 @@ async def register(req: RegisterRequest):
 
     try:
         conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
 
+        cur.execute(
+            """
+            INSERT INTO users (username, email, password_hash)
+            VALUES (%s, %s, %s)
+            """,
+            (req.username, req.email, req.password)
+        )
 
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        return {
+            "success": True,
+            "message": "Account created successfully"
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
 
 @app.post("/login")
 async def login(req: LoginRequest):
