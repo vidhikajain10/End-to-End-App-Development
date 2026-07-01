@@ -507,15 +507,15 @@ async def login(req: LoginRequest):
 # ─── Routes ──────────────────────────────────────────────────────────────────
 @app.get("/")
 async def home():
-    return FileResponse("templates/login.html")
+    return FileResponse("login.html")
 
 @app.get("/register-page")
 async def register_page():
-    return FileResponse("templates/register.html")
+    return FileResponse("register.html")
 
 @app.get("/dashboard")
 async def dashboard():
-    return FileResponse("templates/dashboard.html")
+    return FileResponse("dashboard.html")
 
 @app.get("/builder")
 async def builder():
