@@ -43,18 +43,25 @@ PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 def save_project(app_name, prompt):
-    if not DATABASE_URL:
-        print("DATABASE_URL not configured")
-        return
-
-    if psycopg2 is None:
-        print("psycopg2 not available")
+    if not DATABASE_URL or psycopg2 is None:
         return
 
     try:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
-        
+
+        cur.execute(
+            """
+            INSERT INTO projects (app_name, prompt)
+            VALUES (%s, %s)
+            """,
+            (app_name, prompt)
+        )
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
     except Exception as e:
         print("Database Error:", e)
     cur = conn.cursor()
@@ -615,7 +622,7 @@ async def generate(req: GenerateRequest):
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
             for file_path in project_dir.rglob("*"):
                 if file_path.is_file():
-                    arcname = project_id / file_path.relative_to(project_dir)
+                    arcname = str(Path(project_id) / file_path.relative_to(project_dir))
                     zf.write(file_path, arcname)
 
         zip_size_kb = zip_path.stat().st_size / 1024
@@ -699,5 +706,5 @@ async def get_file(project_id: str, file_path: str):
     return FileResponse(full_path, media_type="text/plain")
 
 
-# Serve dashboard UI
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+
+
