@@ -31,7 +31,7 @@ app = FastAPI(title="AI App Builder", version="2.0")
 @app.get("/debug")
 async def debug():
     return {
-        "psycopg2_loaded": psycopg2 is not None,
+        "psycopg_loaded": True,
         "database_url_exists": DATABASE_URL is not None
     }
 
@@ -428,12 +428,6 @@ class LoginRequest(BaseModel):
 @app.post("/register")
 async def register(req: RegisterRequest):
 
-    if psycopg2 is None:
-        return {
-            "success": False,
-            "message": "psycopg2 failed to load"
-        }
-
     if not DATABASE_URL:
         return {
             "success": False,
@@ -441,7 +435,7 @@ async def register(req: RegisterRequest):
         }
 
     try:
-        conn = psycopg2.connect(DATABASE_URL)
+        conn = psycopg.connect(DATABASE_URL)
         cur = conn.cursor()
 
         cur.execute(
@@ -467,40 +461,41 @@ async def register(req: RegisterRequest):
             "success": False,
             "message": str(e)
         }
-
 @app.post("/login")
 async def login(req: LoginRequest):
 
-    if psycopg2 is None:
-        raise HTTPException(500, "Database unavailable")
+    if not DATABASE_URL:
+        raise HTTPException(500, "DATABASE_URL missing")
 
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
+    try:
+        conn = psycopg.connect(DATABASE_URL)
+        cur = conn.cursor()
 
-    cur.execute(
-        """
-        SELECT id, username
-        FROM users
-        WHERE email=%s AND password_hash=%s
-        """,
-        (req.email, req.password)
-    )
+        cur.execute(
+            """
+            SELECT id, username
+            FROM users
+            WHERE email=%s AND password_hash=%s
+            """,
+            (req.email, req.password)
+        )
 
-    user = cur.fetchone()
+        user = cur.fetchone()
 
-    cur.close()
-    conn.close()
+        cur.close()
+        conn.close()
 
-    if not user:
-        raise HTTPException(401, "Invalid credentials")
+        if not user:
+            raise HTTPException(401, "Invalid credentials")
 
-    return {
-        "success": True,
-        "user_id": user[0],
-        "username": user[1]
-    }
+        return {
+            "success": True,
+            "user_id": user[0],
+            "username": user[1]
+        }
 
-
+    except Exception as e:
+        raise HTTPException(500, str(e))
 
 
 
