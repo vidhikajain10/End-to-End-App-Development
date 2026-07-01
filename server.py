@@ -22,15 +22,22 @@ from pydantic import BaseModel
 from fastapi import HTTPException
 try:
     import psycopg2
-    print("psycopg2 loaded successfully")
+    print("✅ psycopg2 loaded successfully")
 except Exception as e:
-    print("PSYCOPG2 ERROR:", e)
+    print("❌ psycopg2 import failed:", str(e))
     psycopg2 = None
 
 
 
 # ─── App Setup ───────────────────────────────────────────────────────────────
 app = FastAPI(title="AI App Builder", version="2.0")
+
+@app.get("/debug")
+async def debug():
+    return {
+        "psycopg2_loaded": psycopg2 is not None,
+        "database_url_exists": DATABASE_URL is not None
+    }
 
 app.add_middleware(
     CORSMiddleware,
