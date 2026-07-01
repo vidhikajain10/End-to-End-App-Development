@@ -22,7 +22,9 @@ from pydantic import BaseModel
 from fastapi import HTTPException
 try:
     import psycopg2
-except Exception:
+    print("psycopg2 loaded successfully")
+except Exception as e:
+    print("PSYCOPG2 ERROR:", e)
     psycopg2 = None
 
 
