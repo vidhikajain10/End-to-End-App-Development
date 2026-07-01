@@ -20,12 +20,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from fastapi import HTTPException
-try:
-    import psycopg2
-    print("✅ psycopg2 loaded successfully")
-except Exception as e:
-    print("❌ psycopg2 import failed:", str(e))
-    psycopg2 = None
+import psycopg
+
 
 
 
@@ -55,7 +51,7 @@ def save_project(app_name, prompt):
         return
 
     try:
-        conn = psycopg2.connect(DATABASE_URL)
+        conn = psycopg.connect(DATABASE_URL)
         cur = conn.cursor()
 
         cur.execute(
