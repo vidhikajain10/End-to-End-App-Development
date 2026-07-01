@@ -20,7 +20,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from fastapi import HTTPException
-from fastapi.responses import StreamingResponse, FileResponse
 try:
     import psycopg2
 except Exception:
@@ -59,7 +58,7 @@ def save_project(app_name, prompt):
         "message": "DATABASE_URL missing"
            }
 
-conn = psycopg2.connect(DATABASE_URL)
+    conn = psycopg2.connect(DATABASE_URL)
 
         cur = conn.cursor()
 
@@ -75,18 +74,6 @@ conn = psycopg2.connect(DATABASE_URL)
         cur.close()
         conn.close()
 
-    except Exception as e:
-        print("Database Error:", e)
-    cur = conn.cursor()
-
-    cur.execute("""
-        INSERT INTO projects (app_name, prompt)
-        VALUES (%s, %s)
-    """, (app_name, prompt))
-
-    conn.commit()
-    cur.close()
-    conn.close()
 
 
 # ─── Request Models ───────────────────────────────────────────────────────────
@@ -448,34 +435,20 @@ class LoginRequest(BaseModel):
 @app.post("/register")
 async def register(req: RegisterRequest):
 
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
-
-        cur.execute(
-            """
-            INSERT INTO users (username, email, password_hash)
-            VALUES (%s, %s, %s)
-            """,
-            (req.username, req.email, req.password)
-        )
-
-        conn.commit()
-
-        cur.close()
-        conn.close()
-
-        return {
-            "success": True,
-            "message": "User created successfully"
-        }
-
-    except Exception as e:
+    if psycopg2 is None:
         return {
             "success": False,
-            "message": str(e)
+            "message": "psycopg2 failed to load"
         }
 
+    if not DATABASE_URL:
+        return {
+            "success": False,
+            "message": "DATABASE_URL missing"
+        }
+
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
 
 
 
