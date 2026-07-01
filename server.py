@@ -47,7 +47,7 @@ PROJECTS_DIR.mkdir(parents=True, exist_ok=True)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 def save_project(app_name, prompt):
-    if psycopg2 is None or not DATABASE_URL:
+    if not DATABASE_URL:
         return
 
     try:
@@ -259,7 +259,7 @@ if __name__ == "__main__":
         {
             "path": "requirements.txt",
             "content": "fastapi==0.110.0\nuvicorn[standard]==0.28.0\npython-multipart==0.0.9\nhttpx==0.27.0\n"
-            + ("psycopg2-binary==2.9.9\n" if options.postgres else "")
+            + ("psycopg-binary==2.9.9\n" if options.postgres else "")
             + ("pytest==8.1.0\nhttpx==0.27.0\n" if options.tests else ""),
         },
         {
