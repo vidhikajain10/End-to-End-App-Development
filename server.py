@@ -47,7 +47,20 @@ def save_project(app_name, prompt):
         return
 
     try:
-        conn = psycopg2.connect(DATABASE_URL)
+        if psycopg2 is None:
+           return {
+        "success": False,
+        "message": "psycopg2 not installed"
+           }
+
+        if not DATABASE_URL:
+            return {
+        "success": False,
+        "message": "DATABASE_URL missing"
+           }
+
+conn = psycopg2.connect(DATABASE_URL)
+
         cur = conn.cursor()
 
         cur.execute(
@@ -531,6 +544,8 @@ async def generate(req: GenerateRequest):
 )
     if not idea:
         raise HTTPException(400, "No idea provided")
+
+    
 
     options = req.options
     project_id = f"{slugify(idea)}_{int(datetime.now().timestamp() * 1000)}"
